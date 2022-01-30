@@ -57,13 +57,16 @@ def diskio_stat():
     result = []
     stat = psutil.disk_io_counters(perdisk=True)
     global GLOBAL_STATE
+    prev_state, prev_time = GLOBAL_STATE["diskio"]
+    diff_time = (time.time()-prev_time)
     for i in stat.items():
+        prev_item = prev_state.get(i[0])
         info = i[1]
         result.append({ "name": i[0],
-                        "readRequest": info.read_count,
-                        "writeRequest": info.write_count,
-                        "readBytes": info.read_bytes,
-                        "writeBytes": info.write_bytes,
+                        "readRequestPerSec": (info.read_count - prev_item.read_count) / diff_time,
+                        "writeRequestPerSec": (info.write_count - info.write_count) / diff_time,
+                        "readPerSecBytes": (info.read_bytes - info.read_bytes)/ diff_time,
+                        "writePerSecBytes": (info.write_bytes - info.write_bytes)/ diff_time,
                         "busy": info.busy_time,
                         "metrica": name
                       })
@@ -101,7 +104,8 @@ def init_collectors():
 def run():
     first_cycle = True
     flag_add_collectors = True
-    collectors = [ load_stat, socket_stat, network_stat, cpu_stat, memory_stat, filesystem_stat, uptime_stat ]
+    collectors = []
+    #collectors = [ load_stat, socket_stat, network_stat, cpu_stat, memory_stat, filesystem_stat, uptime_stat ]
     try:
         loop_time = int(sys.argv[1]) if len(sys.argv) > 1 else 5
     except Exception as err:
