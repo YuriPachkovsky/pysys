@@ -121,10 +121,10 @@ def run():
             stat = i()
             if isinstance(stat, list):
                 for elem in stat:
-                    elem["timestamp"] = timestamp
+                    elem["eventDate"] = timestamp
                     print(json.dumps(elem))
             else:
-                stat["timestamp"] = timestamp
+                stat["eventDate"] = timestamp
                 print(json.dumps(stat))
         if first_cycle:
             first_cycle = False
