@@ -4,6 +4,7 @@ import argparse
 import time
 import re
 import sys
+import os
 import requests
 
 GLOBAL_STATE = {}
@@ -114,12 +115,14 @@ def init_collectors():
 def stubstatus_stat():
     list_urls = GLOBAL_STATE['args'].list_urls
     result = []
+    hostname = os.uname().nodename
     for url in list_urls:
         data = requests.get(url).text
         data = re.findall(r'(\d+)', data)
+        data = list(map(lambda x: int(x), data))
         result.append(
             {
-                "hostname": "",
+                "hostname": hostname,
                 "active": data[0],
                 "current": data[4] + data[5] + data[6],
                 "reading": data[4],
