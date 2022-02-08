@@ -139,8 +139,8 @@ def run():
     global GLOBAL_STATE
     GLOBAL_STATE['args'] = args
 
-    collectors = [stubstatus_stat]
-    #collectors = [ load_stat, socket_stat, network_stat, cpu_stat, memory_stat, filesystem_stat, uptime_stat ]
+    #collectors = [stubstatus_stat]
+    collectors = [ load_stat, socket_stat, network_stat, cpu_stat, memory_stat, filesystem_stat, uptime_stat, stubstatus_stat ]
     try:
         loop_time = int(sys.argv[1]) if len(sys.argv) > 1 else 5
     except Exception as err:
