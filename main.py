@@ -1,9 +1,19 @@
 import psutil
 import json
+import argparse
 import time
+import re
 import sys
+import requests
 
 GLOBAL_STATE = {}
+
+def init():
+    parser = argparse.ArgumentParser(description='Process collections host and nginx metrics')
+    parser.add_argument('cycle', metavar='timer', type=int, help='cycling time')
+    parser.add_argument('list_urls', metavar='Urls', type=str, nargs='+', help='list url for stubstatus like (http://qwe.com/sts)')
+    return parser.parse_args()
+
 
 def load_stat():
     name = "load"
@@ -101,11 +111,36 @@ def init_collectors():
     diskio_stat_init()
     cpu_stat_init()
 
+def stubstatus_stat():
+    list_urls = GLOBAL_STATE['args'].list_urls
+    result = []
+    for url in list_urls:
+        data = requests.get(url).text
+        data = re.findall(r'(\d+)', data)
+        result.append(
+            {
+                "hostname": "",
+                "active": data[0],
+                "current": data[4] + data[5] + data[6],
+                "reading": data[4],
+                "writing": data[5],
+                "waiting": data[6],
+                "address": url
+            }
+        )
+    return result
+
+
 def run():
     first_cycle = True
     flag_add_collectors = True
-    #collectors = []
-    collectors = [ load_stat, socket_stat, network_stat, cpu_stat, memory_stat, filesystem_stat, uptime_stat ]
+
+    args = init()
+    global GLOBAL_STATE
+    GLOBAL_STATE['args'] = args
+
+    collectors = [stubstatus_stat]
+    #collectors = [ load_stat, socket_stat, network_stat, cpu_stat, memory_stat, filesystem_stat, uptime_stat ]
     try:
         loop_time = int(sys.argv[1]) if len(sys.argv) > 1 else 5
     except Exception as err:
