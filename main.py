@@ -94,7 +94,7 @@ def filesystem_stat():
 
 def uptime_stat():
     name = "boot"
-    stat = time.time() - psutil.boot_time()
+    stat = int(time.time() - psutil.boot_time())
     return {"duration": stat, "metrica": name}
 
 def init_collectors():
