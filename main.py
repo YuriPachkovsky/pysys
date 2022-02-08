@@ -113,6 +113,7 @@ def init_collectors():
     cpu_stat_init()
 
 def stubstatus_stat():
+    name = "stubstatus"
     list_urls = GLOBAL_STATE['args'].list_urls
     result = []
     hostname = os.uname().nodename
@@ -128,7 +129,8 @@ def stubstatus_stat():
                 "reading": data[4],
                 "writing": data[5],
                 "waiting": data[6],
-                "address": url
+                "address": url,
+                "metrica": name
             }
         )
     return result
